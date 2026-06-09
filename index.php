@@ -369,6 +369,12 @@ function asset_version(string $path): string
       color: #ffffff;
     }
 
+    .floating-panel,
+    .floating-panel p,
+    .floating-panel .text-secondary {
+      color: #ffffff !important;
+    }
+
     .trust-strip {
       padding-top: 1.3rem;
       padding-bottom: 0;
