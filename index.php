@@ -83,7 +83,7 @@ function asset_version(string $path): string
     }
 
     section[id] {
-      scroll-margin-top: 7rem;
+      scroll-margin-top: 5.75rem;
     }
 
     .section-title {
@@ -740,7 +740,7 @@ function asset_version(string $path): string
       }
 
       .hero {
-        padding-top: 7.4rem;
+        padding-top: 6.8rem;
       }
 
       .hero-metrics {
@@ -798,6 +798,10 @@ function asset_version(string $path): string
 
       .navbar {
         padding: 0.85rem 0;
+      }
+
+      section[id] {
+        scroll-margin-top: 5rem;
       }
 
       .navbar-collapse {
