@@ -179,7 +179,7 @@ function asset_version(string $path): string
         left: 0.75rem;
         padding: 1rem;
         border-radius: 24px;
-        background: rgba(255, 255, 255, 0.84);
+        background: rgb(255, 255, 255);
         backdrop-filter: blur(18px);
         -webkit-backdrop-filter: blur(18px);
         border: 1px solid rgba(255, 255, 255, 0.72);
@@ -561,6 +561,63 @@ function asset_version(string $path): string
       border: 1px solid rgba(255, 255, 255, 0.72);
     }
 
+    main img {
+      cursor: zoom-in;
+    }
+
+    .image-lightbox-modal {
+      background: rgba(0, 0, 0, 0.58);
+    }
+
+    .image-lightbox-modal .modal-dialog {
+      margin: 0;
+    }
+
+    .image-lightbox-modal .modal-content {
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      min-height: 100vh;
+    }
+
+    .image-lightbox-modal .modal-body {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .image-lightbox-modal img {
+      max-width: 100%;
+      max-height: calc(100vh - 4rem);
+      width: auto;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      margin: 0 auto;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .image-lightbox-close {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1060;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      opacity: 1;
+      background-size: 1.05rem;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-linecap='round' stroke-width='2'%3e%3cpath d='M3 3l10 10M13 3L3 13'/%3e%3c/svg%3e");
+    }
+
     .contact-card a {
       color: var(--brand-900);
       text-decoration: none;
@@ -680,6 +737,18 @@ function asset_version(string $path): string
 
       .hero-metrics {
         display: none;
+      }
+
+      .floating-panel {
+        background: rgba(14, 20, 18, 0.78);
+        border-color: rgba(255, 255, 255, 0.14);
+      }
+
+      .floating-panel,
+      .floating-panel strong,
+      .floating-panel p,
+      .floating-panel .text-white {
+        color: #fff !important;
       }
 
       .navbar {
@@ -1114,6 +1183,17 @@ customers.
     </footer>
   </div>
 
+  <div class="modal fade image-lightbox-modal" id="imageLightboxModal" tabindex="-1" aria-labelledby="imageLightboxLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <button type="button" class="btn-close image-lightbox-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          <img id="imageLightboxTarget" src="" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script>
     const revealItems = document.querySelectorAll(".reveal");
@@ -1130,6 +1210,30 @@ customers.
       item.style.transitionDelay = `${Math.min(index * 35, 240)}ms`;
       observer.observe(item);
     });
+
+    const lightboxModalElement = document.getElementById("imageLightboxModal");
+    const lightboxTarget = document.getElementById("imageLightboxTarget");
+
+    if (lightboxModalElement && lightboxTarget && window.bootstrap) {
+      const lightboxModal = new bootstrap.Modal(lightboxModalElement);
+      const lightboxImages = document.querySelectorAll("main img");
+
+      lightboxImages.forEach((image) => {
+        image.addEventListener("click", () => {
+          const source = image.getAttribute("src");
+          const alt = image.getAttribute("alt") || "Expanded image";
+
+          lightboxTarget.setAttribute("src", source);
+          lightboxTarget.setAttribute("alt", alt);
+          lightboxModal.show();
+        });
+      });
+
+      lightboxModalElement.addEventListener("hidden.bs.modal", () => {
+        lightboxTarget.setAttribute("src", "");
+        lightboxTarget.setAttribute("alt", "");
+      });
+    }
   </script>
 </body>
 </html>
