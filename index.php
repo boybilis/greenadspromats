@@ -57,9 +57,7 @@ function asset_version(string $path): string
 
     .site-shell,
     main,
-    section,
-    .container,
-    .row {
+    section {
       max-width: 100%;
     }
 
@@ -441,12 +439,6 @@ function asset_version(string $path): string
       color: var(--brand-700);
       font-size: 1.2rem;
       margin-bottom: 1rem;
-    }
-
-    #about {
-      background:
-        linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
-        url("assets/images/cover.jpg?v=<?php echo asset_version('assets/images/cover.jpg'); ?>") center center / cover no-repeat;
     }
 
     .split-highlight {
@@ -854,6 +846,7 @@ function asset_version(string $path): string
       .contact-line {
         gap: 0.75rem;
       }
+
     }
 
     @media (prefers-reduced-motion: reduce) {
