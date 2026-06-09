@@ -878,6 +878,7 @@ function asset_version(string $path): string
             <li class="nav-item"><a class="nav-link" href="#products">Products</a></li>
             <li class="nav-item"><a class="nav-link" href="#equipment">Equipment</a></li>
             <li class="nav-item"><a class="nav-link" href="#clients">Clients</a></li>
+            <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
             <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
               <a class="btn btn-brand" href="#contact">Request a Quote</a>
             </li>
