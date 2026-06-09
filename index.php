@@ -1232,7 +1232,7 @@ customers.
     <footer>
       <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
         <div>© 2026 Green Ads &amp; Promats, Inc. All rights reserved.</div>
-        <div>Designed for responsive viewing across desktop and mobile devices.</div>
+        <div></div>
       </div>
     </footer>
   </div>
@@ -1286,6 +1286,20 @@ customers.
       lightboxModalElement.addEventListener("hidden.bs.modal", () => {
         lightboxTarget.setAttribute("src", "");
         lightboxTarget.setAttribute("alt", "");
+      });
+    }
+
+    const navCollapseElement = document.getElementById("siteNav");
+    if (navCollapseElement && window.bootstrap) {
+      const navCollapseInstance = bootstrap.Collapse.getOrCreateInstance(navCollapseElement, { toggle: false });
+      const navLinks = navCollapseElement.querySelectorAll(".nav-link, .btn-brand");
+
+      navLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth < 1200 && navCollapseElement.classList.contains("show")) {
+            navCollapseInstance.hide();
+          }
+        });
       });
     }
   </script>
