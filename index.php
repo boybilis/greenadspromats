@@ -678,6 +678,10 @@ function asset_version(string $path): string
         width: min(100%, 200px);
       }
 
+      .hero-metrics {
+        display: none;
+      }
+
       .navbar {
         padding: 0.85rem 0;
       }
@@ -799,7 +803,7 @@ customers.
                 </div>
                 <div class="floating-panel glass-card">
                   <strong>Built for Business.</strong>
-                  <p class="mb-0 text-white">From custom polos and jackets to event banners and promotional giveaways, the product mix is designed for branding, activations, uniforms, and corporate campaigns.</p>
+                  <p class="mb-0 text-black">From custom polos and jackets to event banners and promotional giveaways, the product mix is designed for branding, activations, uniforms, and corporate campaigns.</p>
                 </div>
               </div>
             </div>
