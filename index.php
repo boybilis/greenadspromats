@@ -40,6 +40,7 @@ function asset_version(string $path): string
 
     html {
       scroll-behavior: smooth;
+      overflow-x: clip;
     }
 
     body {
@@ -50,7 +51,19 @@ function asset_version(string $path): string
         radial-gradient(circle at 85% 10%, rgba(24, 88, 76, 0.18), transparent 28%),
         linear-gradient(180deg, #f7fbfa 0%, #eef6f3 100%);
       font-family: "Manrope", sans-serif;
-      overflow-x: hidden;
+      overflow-x: clip;
+    }
+
+    .site-shell,
+    main,
+    section,
+    .container,
+    .row {
+      max-width: 100%;
+    }
+
+    .row > * {
+      min-width: 0;
     }
 
     h1, h2, h3, h4, .brand-title {
@@ -631,6 +644,17 @@ function asset_version(string $path): string
       border-top: 1px solid rgba(24, 88, 76, 0.08);
     }
 
+    .contact-line > div {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .contact-line a {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
     .contact-line:first-of-type {
       border-top: 0;
       padding-top: 0;
@@ -735,6 +759,11 @@ function asset_version(string $path): string
         width: min(100%, 200px);
       }
 
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
       .hero-metrics {
         display: none;
       }
@@ -787,6 +816,10 @@ function asset_version(string $path): string
 
       .product-media-item img {
         height: 300px;
+      }
+
+      .contact-line {
+        gap: 0.75rem;
       }
     }
 
