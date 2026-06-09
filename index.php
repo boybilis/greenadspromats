@@ -443,6 +443,12 @@ function asset_version(string $path): string
       margin-bottom: 1rem;
     }
 
+    #about {
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+        url("assets/images/cover.jpg?v=<?php echo asset_version('assets/images/cover.jpg'); ?>") center center / cover no-repeat;
+    }
+
     .split-highlight {
       border-radius: var(--radius-xl);
       overflow: hidden;
@@ -458,6 +464,7 @@ function asset_version(string $path): string
       object-fit: cover;
       object-position: center center;
       min-height: 520px;
+      display: block;
     }
 
     .split-highlight .overlay-card {
@@ -465,6 +472,7 @@ function asset_version(string $path): string
       left: 1.4rem;
       right: 1.4rem;
       bottom: 1.4rem;
+      z-index: 2;
       border-radius: 22px;
       padding: 1.15rem;
       background: rgba(13, 28, 25, 0.55);
