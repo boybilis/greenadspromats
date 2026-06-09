@@ -52,6 +52,7 @@ function asset_version(string $path): string
         linear-gradient(180deg, #f7fbfa 0%, #eef6f3 100%);
       font-family: "Manrope", sans-serif;
       overflow-x: clip;
+      width: 100%;
     }
 
     .site-shell,
@@ -60,6 +61,11 @@ function asset_version(string $path): string
     .container,
     .row {
       max-width: 100%;
+    }
+
+    .site-shell {
+      width: 100%;
+      overflow-x: clip;
     }
 
     .row > * {
@@ -764,6 +770,16 @@ function asset_version(string $path): string
         padding-right: 1rem;
       }
 
+      .row {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .row > * {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+
       .hero-metrics {
         display: none;
       }
@@ -782,6 +798,11 @@ function asset_version(string $path): string
 
       .navbar {
         padding: 0.85rem 0;
+      }
+
+      .navbar-collapse {
+        left: 1rem;
+        right: 1rem;
       }
 
       .navbar-toggler {
