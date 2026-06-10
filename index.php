@@ -1,8 +1,274 @@
 <?php
+session_start();
+
+function env_value(string $key, string $default = ''): string
+{
+    $value = getenv($key);
+    return $value !== false ? trim((string) $value) : $default;
+}
+
+function client_ip_address(): string
+{
+    $keys = ['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR'];
+    foreach ($keys as $key) {
+        if (!empty($_SERVER[$key])) {
+            $rawValue = trim((string) $_SERVER[$key]);
+            if ($key === 'HTTP_X_FORWARDED_FOR') {
+                $parts = array_map('trim', explode(',', $rawValue));
+                $rawValue = (string) ($parts[0] ?? '');
+            }
+            if (filter_var($rawValue, FILTER_VALIDATE_IP)) {
+                return $rawValue;
+            }
+        }
+    }
+
+    return 'unknown';
+}
+
+function rate_limit_file_path(string $ipAddress): string
+{
+    return __DIR__ . '/tmp_rate_limit_' . sha1($ipAddress) . '.json';
+}
+
+function is_rate_limited(string $ipAddress, int $limit, int $windowSeconds): bool
+{
+    $filePath = rate_limit_file_path($ipAddress);
+    $now = time();
+    $attempts = [];
+
+    if (file_exists($filePath)) {
+        $decoded = json_decode((string) file_get_contents($filePath), true);
+        if (is_array($decoded)) {
+            $attempts = array_values(array_filter($decoded, static fn ($timestamp) => is_int($timestamp) && ($now - $timestamp) < $windowSeconds));
+        }
+    }
+
+    return count($attempts) >= $limit;
+}
+
+function record_rate_limit_attempt(string $ipAddress, int $windowSeconds): void
+{
+    $filePath = rate_limit_file_path($ipAddress);
+    $now = time();
+    $attempts = [];
+
+    if (file_exists($filePath)) {
+        $decoded = json_decode((string) file_get_contents($filePath), true);
+        if (is_array($decoded)) {
+            $attempts = array_values(array_filter($decoded, static fn ($timestamp) => is_int($timestamp) && ($now - $timestamp) < $windowSeconds));
+        }
+    }
+
+    $attempts[] = $now;
+    file_put_contents($filePath, json_encode($attempts, JSON_THROW_ON_ERROR));
+}
+
 function asset_version(string $path): string
 {
     $fullPath = __DIR__ . '/' . ltrim($path, '/');
     return file_exists($fullPath) ? (string) filemtime($fullPath) : (string) time();
+}
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+$productCategories = [
+    'Customized Polos & Jackets',
+    'Jerseys & Crew Neck Shirts',
+    'Eco Bags & Promotional Giveaways',
+    'Digital Prints & Event Support',
+];
+
+$smtpConfig = [
+    'host' => env_value('GAP_SMTP_HOST', 'smtp.hostinger.com'),
+    'port' => (int) env_value('GAP_SMTP_PORT', '465'),
+    'username' => env_value('GAP_SMTP_USERNAME', 'sales@greenads.info'),
+    'password' => env_value('GAP_SMTP_PASSWORD'),
+    'encryption' => env_value('GAP_SMTP_ENCRYPTION', 'ssl'),
+    'from_email' => env_value('GAP_FROM_EMAIL', 'sales@greenads.info'),
+    'from_name' => env_value('GAP_FROM_NAME', 'Green Ads & Promats Website'),
+    'recipient_email' => 'sales@greenads.info',
+    'recipient_name' => 'Green Ads Sales',
+];
+
+$inquiryForm = [
+    'email' => '',
+    'contact_number' => '',
+    'category' => '',
+    'inquiry_details' => '',
+    'website' => '',
+];
+
+$inquiryErrors = [];
+$inquirySuccess = '';
+$openInquiryModal = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'inquiry') {
+    $openInquiryModal = true;
+    $clientIpAddress = client_ip_address();
+    $rateLimitMaxAttempts = 5;
+    $rateLimitWindowSeconds = 600;
+
+    $inquiryForm['email'] = trim((string) ($_POST['email'] ?? ''));
+    $inquiryForm['contact_number'] = trim((string) ($_POST['contact_number'] ?? ''));
+    $inquiryForm['category'] = trim((string) ($_POST['category'] ?? ''));
+    $inquiryForm['inquiry_details'] = trim((string) ($_POST['inquiry_details'] ?? ''));
+    $inquiryForm['website'] = trim((string) ($_POST['website'] ?? ''));
+
+    if ($inquiryForm['website'] !== '') {
+        $inquiryErrors[] = 'Your submission could not be processed. Please try again.';
+    }
+
+    if (!hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) {
+        $inquiryErrors[] = 'The form session expired. Please try again.';
+    }
+
+    if (is_rate_limited($clientIpAddress, $rateLimitMaxAttempts, $rateLimitWindowSeconds)) {
+        $inquiryErrors[] = 'Too many inquiry attempts were sent from this connection. Please wait a few minutes and try again.';
+    }
+
+    if (!filter_var($inquiryForm['email'], FILTER_VALIDATE_EMAIL)) {
+        $inquiryErrors[] = 'Please enter a valid email address.';
+    }
+
+    if ($inquiryForm['contact_number'] === '') {
+        $inquiryErrors[] = 'Please enter a contact number.';
+    }
+
+    if (!in_array($inquiryForm['category'], $productCategories, true)) {
+        $inquiryErrors[] = 'Please choose a product category.';
+    }
+
+    if ($inquiryForm['inquiry_details'] === '' || mb_strlen($inquiryForm['inquiry_details']) < 10) {
+        $inquiryErrors[] = 'Please enter your inquiry details.';
+    }
+
+    if (empty($smtpConfig['password'])) {
+        $inquiryErrors[] = 'SMTP password is not configured yet. Set GAP_SMTP_PASSWORD on the server before going live.';
+    }
+
+    if (!$inquiryErrors) {
+        record_rate_limit_attempt($clientIpAddress, $rateLimitWindowSeconds);
+
+        require_once __DIR__ . '/vendor/phpmailer/src/Exception.php';
+        require_once __DIR__ . '/vendor/phpmailer/src/PHPMailer.php';
+        require_once __DIR__ . '/vendor/phpmailer/src/SMTP.php';
+
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host = $smtpConfig['host'];
+            $mail->SMTPAuth = true;
+            $mail->Username = $smtpConfig['username'];
+            $mail->Password = $smtpConfig['password'];
+            $mail->Port = $smtpConfig['port'];
+
+            if ($smtpConfig['encryption'] === 'tls') {
+                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            } else {
+                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+            }
+
+            $mail->setFrom($smtpConfig['from_email'], $smtpConfig['from_name']);
+            $mail->addAddress($smtpConfig['recipient_email'], $smtpConfig['recipient_name']);
+            $mail->addReplyTo($inquiryForm['email']);
+            $mail->isHTML(true);
+            $mail->Subject = 'Website Inquiry: ' . $inquiryForm['category'];
+
+            $safeEmail = htmlspecialchars($inquiryForm['email'], ENT_QUOTES, 'UTF-8');
+            $safeContact = htmlspecialchars($inquiryForm['contact_number'], ENT_QUOTES, 'UTF-8');
+            $safeCategory = htmlspecialchars($inquiryForm['category'], ENT_QUOTES, 'UTF-8');
+            $safeDetails = nl2br(htmlspecialchars($inquiryForm['inquiry_details'], ENT_QUOTES, 'UTF-8'));
+
+            $mail->Body = "
+                <h2>New Website Inquiry</h2>
+                <p><strong>Email:</strong> {$safeEmail}</p>
+                <p><strong>Contact Number:</strong> {$safeContact}</p>
+                <p><strong>Product Category:</strong> {$safeCategory}</p>
+                <p><strong>Inquiry Details:</strong><br>{$safeDetails}</p>
+            ";
+
+            $mail->AltBody =
+                "New Website Inquiry\n" .
+                "Email: {$inquiryForm['email']}\n" .
+                "Contact Number: {$inquiryForm['contact_number']}\n" .
+                "Product Category: {$inquiryForm['category']}\n\n" .
+                "Inquiry Details:\n{$inquiryForm['inquiry_details']}";
+
+            $mail->send();
+
+            $autoReply = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $autoReply->isSMTP();
+            $autoReply->Host = $smtpConfig['host'];
+            $autoReply->SMTPAuth = true;
+            $autoReply->Username = $smtpConfig['username'];
+            $autoReply->Password = $smtpConfig['password'];
+            $autoReply->Port = $smtpConfig['port'];
+
+            if ($smtpConfig['encryption'] === 'tls') {
+                $autoReply->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            } else {
+                $autoReply->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+            }
+
+            $autoReply->setFrom($smtpConfig['from_email'], 'Green Ads & Promats Sales');
+            $autoReply->addAddress($inquiryForm['email']);
+            $autoReply->isHTML(true);
+            $autoReply->Subject = 'Thank you for your inquiry';
+            $logoPath = __DIR__ . '/assets/images/full_logo.png';
+            $logoHtml = '';
+            if (file_exists($logoPath)) {
+                $autoReply->addEmbeddedImage($logoPath, 'gap_full_logo');
+                $logoHtml = '<img src="cid:gap_full_logo" alt="Green Ads &amp; Promats" style="display:block;max-width:280px;width:100%;height:auto;margin:0 auto 24px;">';
+            }
+
+            $autoReply->Body = '
+                <div style="margin:0;padding:32px 16px;background:#eef6f3;font-family:Arial,sans-serif;color:#18342d;">
+                  <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 16px 36px rgba(24,88,76,0.10);">
+                    <div style="background:linear-gradient(135deg,#13ca6d,#18584c);padding:28px 24px;text-align:center;">
+                      ' . $logoHtml . '
+                      <div style="font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#dff8ea;font-weight:bold;">Wear • Promote • Connect</div>
+                    </div>
+                    <div style="padding:32px 28px;">
+                      <h1 style="margin:0 0 16px;font-size:28px;line-height:1.15;color:#1a3932;">Thank you for your inquiry.</h1>
+                      <p style="margin:0 0 16px;font-size:16px;line-height:1.7;color:#45615b;">
+                        We have received your message about <strong style="color:#18584c;">' . $safeCategory . '</strong> and our team will keep in touch as soon as possible.
+                      </p>
+                      <p style="margin:0 0 16px;font-size:16px;line-height:1.7;color:#45615b;">
+                        If you need to add more details, you can reply directly to this email and our sales team will review it.
+                      </p>
+                      <div style="margin:24px 0 0;padding:18px 20px;border-radius:18px;background:#f4fbf8;border:1px solid #d8efea;">
+                        <div style="font-size:14px;line-height:1.7;color:#45615b;"><strong style="color:#1a3932;">Submitted Contact Number:</strong> ' . $safeContact . '</div>
+                        <div style="font-size:14px;line-height:1.7;color:#45615b;"><strong style="color:#1a3932;">Submitted Email:</strong> ' . $safeEmail . '</div>
+                      </div>
+                    </div>
+                    <div style="padding:20px 28px;background:#f7fbfa;border-top:1px solid #e1efea;font-size:13px;line-height:1.7;color:#5f6f6a;">
+                      Green Ads &amp; Promats Sales Team<br>
+                      <a href="mailto:sales@greenads.info" style="color:#18584c;text-decoration:none;">sales@greenads.info</a>
+                    </div>
+                  </div>
+                </div>
+            ';
+            $autoReply->AltBody = "Thank you for your inquiry with Green Ads & Promats, Inc.\n\nWe have received your message and will keep in touch as soon as possible.\n\nRegards,\nGreen Ads & Promats Sales Team";
+            $autoReply->send();
+
+            $inquirySuccess = 'Your inquiry has been sent. The Green Ads sales team will get back to you soon.';
+            $openInquiryModal = false;
+            $inquiryForm = [
+                'email' => '',
+                'contact_number' => '',
+                'category' => '',
+                'inquiry_details' => '',
+                'website' => '',
+            ];
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        } catch (\PHPMailer\PHPMailer\Exception $exception) {
+            $inquiryErrors[] = 'The inquiry could not be sent right now. ' . $exception->getMessage();
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -303,6 +569,19 @@ function asset_version(string $path): string
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1rem;
+    }
+
+    .page-feedback {
+      position: sticky;
+      top: 5.25rem;
+      z-index: 1025;
+      padding-top: 0.75rem;
+    }
+
+    .page-feedback .alert {
+      border: 0;
+      border-radius: 18px;
+      box-shadow: var(--shadow-md);
     }
 
     .metric-card,
@@ -697,6 +976,42 @@ function asset_version(string $path): string
       border-color: rgba(255, 255, 255, 0.18);
     }
 
+    .inquiry-modal .modal-content {
+      border: 0;
+      border-radius: 28px;
+      box-shadow: var(--shadow-xl);
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .inquiry-modal .modal-header,
+    .inquiry-modal .modal-footer {
+      border-color: rgba(24, 88, 76, 0.08);
+    }
+
+    .inquiry-modal .form-control,
+    .inquiry-modal .form-select {
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      border-color: rgba(24, 88, 76, 0.14);
+      box-shadow: none;
+    }
+
+    .inquiry-modal .form-control:focus,
+    .inquiry-modal .form-select:focus {
+      border-color: rgba(34, 171, 104, 0.55);
+      box-shadow: 0 0 0 0.2rem rgba(34, 171, 104, 0.14);
+    }
+
+    .hp-field {
+      position: absolute !important;
+      left: -9999px !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
     footer {
       padding: 1.7rem 0 2.5rem;
       color: var(--muted);
@@ -921,12 +1236,24 @@ function asset_version(string $path): string
             <li class="nav-item"><a class="nav-link" href="#clients">Clients</a></li>
             <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
             <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
-              <a class="btn btn-brand" href="#contact">Request a Quote</a>
+              <button class="btn btn-brand js-inquiry-trigger" type="button" data-bs-toggle="modal" data-bs-target="#inquiryModal">Request a Quote</button>
             </li>
           </ul>
         </div>
       </div>
     </nav>
+
+    <?php if ($inquiryErrors): ?>
+      <div class="page-feedback">
+        <div class="container">
+          <div class="alert alert-danger mb-0" role="alert">
+            <?php foreach ($inquiryErrors as $error): ?>
+              <div><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <main id="top">
       <section class="hero">
@@ -944,9 +1271,9 @@ provide excellent promotional apparel at the most reasonable cost for our
 customers. 
               </p>
               <div class="hero-actions reveal">
-                <a class="btn btn-brand d-inline-flex align-items-center gap-2" href="mailto:gap.promats@gmail.com">
+                <button class="btn btn-brand d-inline-flex align-items-center gap-2 js-inquiry-trigger" type="button" data-bs-toggle="modal" data-bs-target="#inquiryModal">
                   Start Your Project <i class="bi bi-arrow-up-right-circle"></i>
-                </a>
+                </button>
                 <a class="btn btn-ghost d-inline-flex align-items-center gap-2" href="#products">
                   Explore Products <i class="bi bi-grid"></i>
                 </a>
@@ -1217,7 +1544,11 @@ customers.
                   <i class="bi bi-telephone-fill"></i>
                   <div>
                     <strong>Contact Numbers</strong><br>
-                    <a href="tel:+6328204844">(632) 820 4844</a> / <a href="tel:+6328253663">825 36 63</a> / <a href="tel:+6329441063">944 10 63</a>
+                    <a href="tel:+63279441063">(632) 79441063</a><br>
+                    <a href="tel:+639228337960">(63) 922.8337960</a><br>
+                    <a href="tel:+639460605443">(63) 946.0605443</a><br>
+                    <a href="tel:+639455249782">(63) 945.5249782</a><br>
+                    <a href="tel:+639994503766">(63) 999.4503766</a>
                   </div>
                 </div>
                 <div class="contact-line">
@@ -1225,7 +1556,7 @@ customers.
                   <div>
                     <strong>Email</strong><br>
                     <a href="mailto:gap.promats@gmail.com">gap.promats@gmail.com</a><br>
-                    <a href="mailto:gap.promats@yahoo.com">gap.promats@yahoo.com</a>
+                    <a href="mailto:sales@greenads.info">sales@greenads.info</a>
                   </div>
                 </div>
                 <div class="contact-line">
@@ -1252,8 +1583,8 @@ customers.
                   <p class="mb-4 text-white-50 fs-5">For uniforms, giveaways, branded apparel, or event graphics, Green Ads &amp; Promats can help translate your concept into production-ready output.</p>
                 </div>
                 <div class="d-flex flex-wrap gap-3">
-                  <a class="btn btn-brand" href="mailto:gap.promats@gmail.com?subject=Project%20Inquiry%20for%20Green%20Ads%20%26%20Promats">Email the Team</a>
-                  <a class="btn btn-ghost" href="tel:+6328204844">Call the Office</a>
+                  <button class="btn btn-brand js-inquiry-trigger" type="button" data-bs-toggle="modal" data-bs-target="#inquiryModal">Email the Team</button>
+                  <a class="btn btn-ghost" href="tel:+63279441063">Call the Office</a>
                 </div>
                 <div class="mt-4 pt-4 border-top border-light border-opacity-25">
                   <div class="row g-3">
@@ -1282,6 +1613,76 @@ customers.
         <div></div>
       </div>
     </footer>
+  </div>
+
+  <div class="modal fade inquiry-modal" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <form method="post" action="">
+          <input type="hidden" name="form_type" value="inquiry">
+          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+          <div class="modal-header">
+            <div>
+              <h2 class="modal-title fs-4 mb-1" id="inquiryModalLabel">Send an Inquiry</h2>
+              <p class="mb-0 text-secondary">Tell Green Ads &amp; Promats what you need and the sales team will respond at sales@greenads.info.</p>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="hp-field" aria-hidden="true">
+                <label for="inquiryWebsite">Website</label>
+                <input id="inquiryWebsite" name="website" type="text" tabindex="-1" autocomplete="off" value="<?php echo htmlspecialchars($inquiryForm['website'], ENT_QUOTES, 'UTF-8'); ?>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="inquiryEmail">Email</label>
+                <input class="form-control" id="inquiryEmail" name="email" type="email" required value="<?php echo htmlspecialchars($inquiryForm['email'], ENT_QUOTES, 'UTF-8'); ?>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="inquiryContact">Contact Number</label>
+                <input class="form-control" id="inquiryContact" name="contact_number" type="text" required value="<?php echo htmlspecialchars($inquiryForm['contact_number'], ENT_QUOTES, 'UTF-8'); ?>">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="inquiryCategory">Product Category</label>
+                <select class="form-select" id="inquiryCategory" name="category" required>
+                  <option value="">Select a category</option>
+                  <?php foreach ($productCategories as $category): ?>
+                    <option value="<?php echo htmlspecialchars($category, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $inquiryForm['category'] === $category ? 'selected' : ''; ?>>
+                      <?php echo htmlspecialchars($category, ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="inquiryDetails">Inquiry Details</label>
+                <textarea class="form-control" id="inquiryDetails" name="inquiry_details" rows="6" required><?php echo htmlspecialchars($inquiryForm['inquiry_details'], ENT_QUOTES, 'UTF-8'); ?></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-brand">Send Inquiry</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade inquiry-modal" id="inquirySuccessModal" tabindex="-1" aria-labelledby="inquirySuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-4 mb-0" id="inquirySuccessModalLabel">Inquiry Sent</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0"><?php echo htmlspecialchars($inquirySuccess ?: 'Your inquiry has been sent successfully.', ENT_QUOTES, 'UTF-8'); ?></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-brand" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="modal fade image-lightbox-modal" id="imageLightboxModal" tabindex="-1" aria-labelledby="imageLightboxLabel" aria-hidden="true">
@@ -1352,6 +1753,20 @@ customers.
           }
         });
       });
+    }
+
+    const inquiryModalElement = document.getElementById("inquiryModal");
+    if (inquiryModalElement && window.bootstrap) {
+      const inquiryModal = new bootstrap.Modal(inquiryModalElement);
+      if (<?php echo $openInquiryModal ? 'true' : 'false'; ?>) {
+        inquiryModal.show();
+      }
+    }
+
+    const inquirySuccessModalElement = document.getElementById("inquirySuccessModal");
+    if (inquirySuccessModalElement && window.bootstrap && <?php echo $inquirySuccess ? 'true' : 'false'; ?>) {
+      const inquirySuccessModal = new bootstrap.Modal(inquirySuccessModalElement);
+      inquirySuccessModal.show();
     }
   </script>
 </body>
