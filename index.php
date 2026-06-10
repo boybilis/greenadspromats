@@ -31,8 +31,8 @@ function asset_version(string $path): string
       --line: rgba(24, 88, 76, 0.14);
       --glass: rgba(255, 255, 255, 0.58);
       --glass-strong: rgba(255, 255, 255, 0.76);
-      --shadow-xl: 0 30px 80px rgba(18, 58, 49, 0.18);
-      --shadow-md: 0 18px 40px rgba(18, 58, 49, 0.12);
+      --shadow-xl: 0 18px 42px rgba(18, 58, 49, 0.12);
+      --shadow-md: 0 10px 24px rgba(18, 58, 49, 0.08);
       --radius-xl: 32px;
       --radius-lg: 24px;
       --radius-md: 18px;
@@ -124,10 +124,10 @@ function asset_version(string $path): string
 
     .glass-nav {
       background: rgba(255, 255, 255, 0.68);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(24, 88, 76, 0.08);
-      box-shadow: 0 10px 30px rgba(18, 58, 49, 0.08);
+      box-shadow: 0 8px 22px rgba(18, 58, 49, 0.06);
     }
 
     .navbar {
@@ -197,10 +197,8 @@ function asset_version(string $path): string
         padding: 1rem;
         border-radius: 24px;
         background: rgb(255, 255, 255);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
         border: 1px solid rgba(255, 255, 255, 0.72);
-        box-shadow: 0 24px 48px rgba(18, 58, 49, 0.16);
+        box-shadow: 0 16px 30px rgba(18, 58, 49, 0.1);
       }
 
       .navbar-collapse:not(.show) {
@@ -258,7 +256,6 @@ function asset_version(string $path): string
       border: 1px solid rgba(24, 88, 76, 0.16);
       background: rgba(255, 255, 255, 0.72);
       color: var(--brand-900);
-      backdrop-filter: blur(12px);
     }
 
     .hero {
@@ -314,8 +311,6 @@ function asset_version(string $path): string
     .product-card,
     .contact-card {
       background: var(--glass);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.62);
       box-shadow: var(--shadow-md);
     }
@@ -374,16 +369,18 @@ function asset_version(string $path): string
       max-width: 260px;
       padding: 1.2rem;
       border-radius: 24px;
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.3);
       border-color: rgba(255, 255, 255, 0.42);
       color: #ffffff;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .floating-panel strong {
       display: block;
       margin-bottom: 0.35rem;
       font-size: 1.1rem;
-      color: #ffffff;
+      color: #000000;
     }
 
     .floating-panel,
@@ -402,7 +399,7 @@ function asset_version(string $path): string
       padding: 1rem 1.25rem;
       background: rgba(255, 255, 255, 0.66);
       border: 1px solid rgba(24, 88, 76, 0.1);
-      box-shadow: 0 10px 28px rgba(18, 58, 49, 0.08);
+      box-shadow: 0 8px 18px rgba(18, 58, 49, 0.06);
     }
 
     .trust-card span {
@@ -469,7 +466,8 @@ function asset_version(string $path): string
       padding: 1.15rem;
       background: rgba(13, 28, 25, 0.55);
       color: #fff;
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .equipment-panel {
@@ -539,7 +537,9 @@ function asset_version(string $path): string
       border-radius: 22px;
       background: rgba(255, 255, 255, 0.72);
       border: 1px solid rgba(24, 88, 76, 0.08);
-      box-shadow: 0 12px 30px rgba(18, 58, 49, 0.08);
+      box-shadow: 0 8px 18px rgba(18, 58, 49, 0.06);
+      position: relative;
+      z-index: 1;
     }
 
     .product-media-item img {
@@ -548,6 +548,15 @@ function asset_version(string $path): string
       object-fit: cover;
       object-position: center top;
       display: block;
+      transition: transform 0.35s ease;
+    }
+
+    .product-media-item:hover img {
+      transform: scale(1.04);
+    }
+
+    .product-media-item:hover {
+      z-index: 2;
     }
 
     .product-card .content {
@@ -616,7 +625,7 @@ function asset_version(string $path): string
       display: block;
       object-fit: contain;
       margin: 0 auto;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
     }
 
     .image-lightbox-close {
@@ -628,8 +637,8 @@ function asset_version(string $path): string
       height: 3rem;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.14);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       opacity: 1;
       background-size: 1.05rem;
       background-position: center;
@@ -710,7 +719,7 @@ function asset_version(string $path): string
     .reveal {
       opacity: 0;
       transform: translateY(26px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
+      transition: opacity 0.45s ease, transform 0.45s ease;
     }
 
     .reveal.is-visible {
@@ -758,6 +767,12 @@ function asset_version(string $path): string
       .split-highlight img {
         min-height: 400px;
       }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
     }
 
     @media (max-width: 767.98px) {
@@ -787,6 +802,8 @@ function asset_version(string $path): string
       .floating-panel {
         background: rgba(14, 20, 18, 0.78);
         border-color: rgba(255, 255, 255, 0.14);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
       }
 
       .floating-panel,
@@ -798,6 +815,11 @@ function asset_version(string $path): string
 
       .navbar {
         padding: 0.85rem 0;
+      }
+
+      .glass-nav {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
       }
 
       section[id] {
@@ -858,6 +880,25 @@ function asset_version(string $path): string
       .product-card,
       .btn-brand {
         transition: none;
+      }
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .product-card:hover {
+        transform: none;
+        box-shadow: var(--shadow-md);
+      }
+
+      .product-media-item:hover img {
+        transform: none;
+      }
+
+      .product-media-item:hover {
+        z-index: 1;
+      }
+
+      .btn-brand:hover {
+        transform: none;
       }
     }
   </style>
@@ -928,11 +969,11 @@ customers.
             <div class="col-lg-6">
               <div class="hero-visual-wrap reveal">
                 <div class="hero-visual">
-                  <img src="assets/images/hero3.png?v=<?php echo asset_version('assets/images/hero3.png'); ?>" alt="Green Ads and Promats hero visual">
+                  <img src="assets/images/hero3.jpg?v=<?php echo asset_version('assets/images/hero3.jpg'); ?>" alt="Green Ads and Promats hero visual">
                 </div>
                 <div class="floating-panel glass-card">
                   <strong>Built for Business.</strong>
-                  <p class="mb-0 text-black">From custom polos and jackets to event banners and promotional giveaways, the product mix is designed for branding, activations, uniforms, and corporate campaigns.</p>
+                  <p class="mb-0 text-secondary">From custom polos and jackets to event banners and promotional giveaways, the product mix is designed for branding, activations, uniforms, and corporate campaigns.</p>
                 </div>
               </div>
             </div>
@@ -1123,7 +1164,7 @@ customers.
                 <p class="eyebrow mb-3"><i class="bi bi-gear-wide-connected"></i> Production Capability</p>
                 <h2 class="section-title">Equipment that supports both sewing and print production.</h2>
                 <p class="section-copy">
-                  The company profile features specialized sewing machines and print equipment that allow Green Ads &amp; Promats to handle apparel construction, finishing, cutting, heat transfer, and promotional print output within the same workflow.
+                 Equipped with specialized sewing and printing equipment, Green Ads & Promats delivers complete in-house solutions for apparel construction, cutting, finishing, heat transfer, and promotional printing, ensuring quality, efficiency, and faster project completion.
                 </p>
                 <ul class="feature-list">
                   <li><i class="bi bi-check2-circle"></i><span>Industrial sewing coverage including single needle, button hole, piping, overlock, bar tack, waistband, double needle, flat seam, zigzag, and cutting equipment.</span></li>
@@ -1149,7 +1190,7 @@ customers.
               <h2 class="section-title reveal">Trusted by recognizable brands and organizations.</h2>
             </div>
             <div class="col-lg-5">
-              <p class="section-copy reveal mb-0">The company profile lists clients from manufacturing, telecom, food, entertainment, finance, hospitality, and logistics, reinforcing the breadth of industries already served.</p>
+              <p class="section-copy reveal mb-0">Our portfolio spans a diverse range of industries, including manufacturing, telecommunications, food and beverage, entertainment, finance, hospitality, and logistics. This broad client base reflects our ability to deliver effective solutions tailored to the unique needs of various sectors.</p>
             </div>
           </div>
           <div class="clients-shot reveal">
@@ -1257,19 +1298,23 @@ customers.
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script>
     const revealItems = document.querySelectorAll(".reveal");
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.14 });
+    if (window.innerWidth > 991 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.14 });
 
-    revealItems.forEach((item, index) => {
-      item.style.transitionDelay = `${Math.min(index * 35, 240)}ms`;
-      observer.observe(item);
-    });
+      revealItems.forEach((item, index) => {
+        item.style.transitionDelay = `${Math.min(index * 35, 240)}ms`;
+        observer.observe(item);
+      });
+    } else {
+      revealItems.forEach((item) => item.classList.add("is-visible"));
+    }
 
     const lightboxModalElement = document.getElementById("imageLightboxModal");
     const lightboxTarget = document.getElementById("imageLightboxTarget");
