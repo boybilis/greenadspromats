@@ -170,6 +170,7 @@ $collaredImages = gallery_images('assets/images/collared');
 $jacketImages = gallery_images('assets/images/jackets');
 $sportswearImages = gallery_images('assets/images/sportswear');
 $accessoriesImages = gallery_images('assets/images/accessories');
+$customizeShirtImages = gallery_images('assets/images/customize shirts');
 $clientImages = gallery_images('assets/images/clients');
 
 $smtpConfig = [
@@ -1638,7 +1639,7 @@ customers.
               <h2 class="section-title reveal">Browse our apparel work.</h2>
             </div>
             <div class="col-lg-4">
-              <p class="section-copy reveal mb-0">More visuals, less copy. Swipe or click through collared shirts and jackets, then open any image fullscreen.</p>
+              <p class="section-copy reveal mb-0">Swipe or click through our collections, then open any image fullscreen.</p>
             </div>
           </div>
           <div class="product-showcase">
@@ -1646,6 +1647,7 @@ customers.
             <?php render_product_carousel('jacketsCarousel', 'Jackets', 'Custom jacket and outerwear samples', $jacketImages, 'Jacket sample'); ?>
             <?php render_product_carousel('sportswearCarousel', 'Sportswear', 'Jerseys, activewear, and team apparel samples', $sportswearImages, 'Sportswear sample'); ?>
             <?php render_product_carousel('accessoriesCarousel', 'Accessories & Giveaways', 'Promotional accessories, bags, and giveaway samples', $accessoriesImages, 'Promotional accessory sample'); ?>
+            <?php render_product_carousel('customizeShirtsCarousel', 'Customized Shirts', 'Custom shirt designs and production samples', $customizeShirtImages, 'Customized shirt sample'); ?>
             <?php render_product_carousel('clientsCarousel', 'Client Work', 'Completed projects and client sample gallery', $clientImages, 'Client project sample'); ?>
           </div>
         </div>
