@@ -70,6 +70,91 @@ function asset_version(string $path): string
     return file_exists($fullPath) ? (string) filemtime($fullPath) : (string) time();
 }
 
+function gallery_images(string $folder): array
+{
+    $basePath = __DIR__ . '/' . trim($folder, '/');
+    if (!is_dir($basePath)) {
+        return [];
+    }
+
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    $files = [];
+
+    foreach (scandir($basePath) ?: [] as $fileName) {
+        if ($fileName === '.' || $fileName === '..') {
+            continue;
+        }
+
+        $filePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
+        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        if (is_file($filePath) && in_array($extension, $allowedExtensions, true)) {
+            $files[] = trim($folder, '/') . '/' . $fileName;
+        }
+    }
+
+    natsort($files);
+    return array_values($files);
+}
+
+function image_alt_from_path(string $path, string $fallback): string
+{
+    $name = pathinfo($path, PATHINFO_FILENAME);
+    $name = preg_replace('/[-_]+/', ' ', $name);
+    $name = trim((string) preg_replace('/\s+/', ' ', (string) $name));
+    return $name !== '' ? ucwords($name) : $fallback;
+}
+
+function render_product_carousel(string $carouselId, string $title, string $description, array $images, string $fallbackAlt): void
+{
+    if (!$images) {
+        return;
+    }
+    $placeholderImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900"%3E%3Crect width="900" height="900" fill="%23f3f7f5"/%3E%3C/svg%3E';
+    ?>
+    <div class="product-carousel-panel reveal">
+      <div class="product-carousel-header">
+        <h3><?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></h3>
+        <span><?php echo htmlspecialchars($description, ENT_QUOTES, 'UTF-8'); ?></span>
+      </div>
+      <div id="<?php echo htmlspecialchars($carouselId, ENT_QUOTES, 'UTF-8'); ?>" class="carousel slide" data-bs-ride="false">
+        <div class="carousel-inner">
+          <?php foreach (array_chunk($images, 4) as $slideIndex => $slideImages): ?>
+            <div class="carousel-item <?php echo $slideIndex === 0 ? 'active' : ''; ?>">
+              <div class="product-carousel-grid">
+                <?php foreach ($slideImages as $imagePath): ?>
+                  <?php
+                    $imageUrl = $imagePath . '?v=' . asset_version($imagePath);
+                    $isInitialSlide = $slideIndex === 0;
+                  ?>
+                  <div class="product-gallery-item">
+                    <img
+                      src="<?php echo htmlspecialchars($isInitialSlide ? $imageUrl : $placeholderImage, ENT_QUOTES, 'UTF-8'); ?>"
+                      <?php if (!$isInitialSlide): ?>data-src="<?php echo htmlspecialchars($imageUrl, ENT_QUOTES, 'UTF-8'); ?>"<?php endif; ?>
+                      data-gallery-src="<?php echo htmlspecialchars($imageUrl, ENT_QUOTES, 'UTF-8'); ?>"
+                      alt="<?php echo htmlspecialchars(image_alt_from_path($imagePath, $fallbackAlt), ENT_QUOTES, 'UTF-8'); ?>"
+                      loading="<?php echo $isInitialSlide ? 'eager' : 'lazy'; ?>"
+                      decoding="async"
+                    >
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+        <?php if (count($images) > 4): ?>
+          <button class="carousel-control-prev product-carousel-control" type="button" data-bs-target="#<?php echo htmlspecialchars($carouselId, ENT_QUOTES, 'UTF-8'); ?>" data-bs-slide="prev" aria-label="Previous <?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?>">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          </button>
+          <button class="carousel-control-next product-carousel-control" type="button" data-bs-target="#<?php echo htmlspecialchars($carouselId, ENT_QUOTES, 'UTF-8'); ?>" data-bs-slide="next" aria-label="Next <?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?>">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          </button>
+        <?php endif; ?>
+      </div>
+    </div>
+    <?php
+}
+
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -80,6 +165,9 @@ $productCategories = [
     'Eco Bags & Promotional Giveaways',
     'Digital Prints & Event Support',
 ];
+
+$collaredImages = gallery_images('assets/images/collared');
+$jacketImages = gallery_images('assets/images/jackets');
 
 $smtpConfig = [
     'host' => env_value('GAP_SMTP_HOST', 'smtp.hostinger.com'),
@@ -847,6 +935,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
       margin-bottom: 0.7rem;
     }
 
+    .product-showcase {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .product-carousel-panel {
+      padding: 1.1rem;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow-md);
+    }
+
+    .product-carousel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: 0 0.25rem;
+    }
+
+    .product-carousel-header h3 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .product-carousel-header span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .product-carousel-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .product-gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #fff;
+      border: 1px solid rgba(24, 88, 76, 0.08);
+      aspect-ratio: 4 / 5;
+    }
+
+    .product-gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      transition: transform 0.35s ease;
+    }
+
+    .product-gallery-item:hover img {
+      transform: scale(1.04);
+    }
+
+    .product-carousel-control {
+      width: 3rem;
+      height: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      border-radius: 999px;
+      background: rgba(24, 88, 76, 0.74);
+      opacity: 1;
+    }
+
+    .product-carousel-control.carousel-control-prev {
+      left: 0.75rem;
+    }
+
+    .product-carousel-control.carousel-control-next {
+      right: 0.75rem;
+    }
+
     .pill {
       display: inline-flex;
       align-items: center;
@@ -1083,6 +1249,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
         min-height: 400px;
       }
 
+      .product-carousel-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .reveal {
         opacity: 1;
         transform: none;
@@ -1180,6 +1350,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
         height: 300px;
       }
 
+      .product-carousel-panel {
+        padding: 0.85rem;
+        border-radius: 22px;
+      }
+
+      .product-carousel-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .product-carousel-control {
+        width: 2.55rem;
+        height: 2.55rem;
+      }
+
       .contact-line {
         gap: 0.75rem;
       }
@@ -1205,6 +1390,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
       }
 
       .product-media-item:hover img {
+        transform: none;
+      }
+
+      .product-gallery-item:hover img {
         transform: none;
       }
 
@@ -1392,13 +1581,17 @@ customers.
           <div class="row justify-content-between align-items-end mb-4">
             <div class="col-lg-7">
               <p class="eyebrow reveal mb-3"><i class="bi bi-grid-1x2"></i> Product Range</p>
-              <h2 class="section-title reveal">Promotional apparel, merchandise, and print products under one roof.</h2>
+              <h2 class="section-title reveal">Browse our apparel work.</h2>
             </div>
             <div class="col-lg-4">
-              <p class="section-copy reveal mb-0">The brochure highlights a broad catalog for internal uniforms, event kits, retail merchandise, and campaign collateral, combining garment manufacturing with print and giveaway production.</p>
+              <p class="section-copy reveal mb-0">More visuals, less copy. Swipe or click through collared shirts and jackets, then open any image fullscreen.</p>
             </div>
           </div>
-          <div class="row g-4">
+          <div class="product-showcase">
+            <?php render_product_carousel('collaredCarousel', 'Collared Shirts', 'Custom collared apparel samples', $collaredImages, 'Collared shirt sample'); ?>
+            <?php render_product_carousel('jacketsCarousel', 'Jackets', 'Custom jacket and outerwear samples', $jacketImages, 'Jacket sample'); ?>
+          </div>
+          <div class="row g-4 mt-4">
             <div class="col-md-6">
               <article class="product-card reveal">
                 <div class="product-media">
@@ -1466,7 +1659,7 @@ customers.
                     <img src="assets/images/digital.png?v=<?php echo asset_version('assets/images/digital.png'); ?>" alt="Digital printed banners">
                   </div>
                   <div class="product-media-item">
-                    <img src="assets/images/sublimation.jpg?v=<?php echo asset_version('assets/images/sublimation.jpg'); ?>" alt="Promotional giveaways and event items">
+                    <img src="assets/images/sublimation.jpg?v=<?php echo asset_version('assets/images/sublimation.jpg'); ?>" alt="Sublimation printing samples">
                   </div>
                 </div>
                 <div class="content">
@@ -1719,6 +1912,30 @@ customers.
 
     const lightboxModalElement = document.getElementById("imageLightboxModal");
     const lightboxTarget = document.getElementById("imageLightboxTarget");
+    const productCarousels = document.querySelectorAll(".product-carousel-panel .carousel");
+
+    const loadCarouselSlideImages = (slide) => {
+      if (!slide) {
+        return;
+      }
+
+      slide.querySelectorAll("img[data-src]").forEach((image) => {
+        const source = image.getAttribute("data-src");
+        if (!source) {
+          return;
+        }
+
+        image.setAttribute("src", source);
+        image.removeAttribute("data-src");
+      });
+    };
+
+    productCarousels.forEach((carousel) => {
+      loadCarouselSlideImages(carousel.querySelector(".carousel-item.active"));
+      carousel.addEventListener("slide.bs.carousel", (event) => {
+        loadCarouselSlideImages(event.relatedTarget);
+      });
+    });
 
     if (lightboxModalElement && lightboxTarget && window.bootstrap) {
       const lightboxModal = new bootstrap.Modal(lightboxModalElement);
@@ -1726,7 +1943,7 @@ customers.
 
       lightboxImages.forEach((image) => {
         image.addEventListener("click", () => {
-          const source = image.getAttribute("src");
+          const source = image.getAttribute("data-gallery-src") || image.getAttribute("src");
           const alt = image.getAttribute("alt") || "Expanded image";
 
           lightboxTarget.setAttribute("src", source);
