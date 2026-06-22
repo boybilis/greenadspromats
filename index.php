@@ -1899,7 +1899,7 @@ customers.
     const lightboxNext = document.getElementById("imageLightboxNext");
     const productCarousels = document.querySelectorAll(".product-carousel-panel .carousel");
 
-    const loadCarouselSlideImages = (slide) => {
+    const loadCarouselSlideImages = (slide, preloadOnly = false) => {
       if (!slide) {
         return;
       }
@@ -1910,15 +1910,50 @@ customers.
           return;
         }
 
+        if (preloadOnly) {
+          const preloader = new Image();
+          preloader.src = source;
+        }
+
         image.setAttribute("src", source);
         image.removeAttribute("data-src");
       });
     };
 
+    const scheduleCarouselPreload = (callback) => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(callback, { timeout: 1200 });
+        return;
+      }
+
+      window.setTimeout(callback, 250);
+    };
+
+    const getWrappedCarouselSlide = (slides, index) => {
+      if (!slides.length) {
+        return null;
+      }
+
+      return slides[(index + slides.length) % slides.length];
+    };
+
+    const primeCarouselSlides = (carousel, activeSlide) => {
+      const slides = Array.from(carousel.querySelectorAll(".carousel-item"));
+      const activeIndex = Math.max(slides.indexOf(activeSlide), 0);
+
+      loadCarouselSlideImages(getWrappedCarouselSlide(slides, activeIndex));
+      loadCarouselSlideImages(getWrappedCarouselSlide(slides, activeIndex + 1));
+
+      scheduleCarouselPreload(() => {
+        loadCarouselSlideImages(getWrappedCarouselSlide(slides, activeIndex + 2), true);
+        loadCarouselSlideImages(getWrappedCarouselSlide(slides, activeIndex + 3), true);
+      });
+    };
+
     productCarousels.forEach((carousel) => {
-      loadCarouselSlideImages(carousel.querySelector(".carousel-item.active"));
+      primeCarouselSlides(carousel, carousel.querySelector(".carousel-item.active"));
       carousel.addEventListener("slide.bs.carousel", (event) => {
-        loadCarouselSlideImages(event.relatedTarget);
+        primeCarouselSlides(carousel, event.relatedTarget);
       });
     });
 
