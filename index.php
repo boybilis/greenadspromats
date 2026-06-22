@@ -617,8 +617,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
     }
 
     .hero {
+      position: relative;
       padding-top: 9rem;
       padding-bottom: 5rem;
+      background:
+       
+        url("assets/images/gap_hero2.jpg?v=<?php echo asset_version('assets/images/gap_hero2.jpg'); ?>") center / cover no-repeat;
+      overflow: hidden;
     }
 
     .eyebrow {
@@ -645,7 +650,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
     .hero-lead {
       font-size: 1.15rem;
       line-height: 1.85;
-      color: var(--muted);
+      color: white;
       max-width: 42rem;
     }
 
