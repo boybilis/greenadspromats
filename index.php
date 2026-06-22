@@ -1309,6 +1309,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
         min-height: 400px;
       }
 
+      #about .split-highlight {
+        min-height: auto;
+        margin-bottom: 0.5rem;
+      }
+
+      #about .split-highlight img {
+        height: auto;
+        min-height: 360px;
+      }
+
       .product-carousel-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -1356,6 +1366,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
       .floating-panel p,
       .floating-panel .text-white {
         color: #fff !important;
+      }
+
+      #about .split-highlight {
+        border-radius: 24px;
+      }
+
+      #about .split-highlight img {
+        min-height: 320px;
+      }
+
+      #about .split-highlight .overlay-card {
+        position: relative;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        margin: -5.5rem 1rem 1rem;
       }
 
       .navbar {
