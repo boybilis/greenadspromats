@@ -125,7 +125,7 @@ function render_product_carousel(string $carouselId, string $title, string $desc
                 <?php foreach ($slideImages as $imagePath): ?>
                   <?php
                     $imageUrl = $imagePath . '?v=' . asset_version($imagePath);
-                    $isInitialSlide = $slideIndex === 0;
+                    $isInitialSlide = $slideIndex < 2;
                   ?>
                   <div class="product-gallery-item">
                     <img
