@@ -168,6 +168,9 @@ $productCategories = [
 
 $collaredImages = gallery_images('assets/images/collared');
 $jacketImages = gallery_images('assets/images/jackets');
+$sportswearImages = gallery_images('assets/images/sportswear');
+$accessoriesImages = gallery_images('assets/images/accessories');
+$clientImages = gallery_images('assets/images/clients');
 
 $smtpConfig = [
     'host' => env_value('GAP_SMTP_HOST', 'smtp.hostinger.com'),
@@ -1091,6 +1094,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-linecap='round' stroke-width='2'%3e%3cpath d='M3 3l10 10M13 3L3 13'/%3e%3c/svg%3e");
     }
 
+    .image-lightbox-nav {
+      position: fixed;
+      bottom: 1.25rem;
+      z-index: 1060;
+      width: 3.25rem;
+      height: 3.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-size: 1.8rem;
+      line-height: 1;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      transition: background 180ms ease, transform 180ms ease;
+    }
+
+    .image-lightbox-nav:hover,
+    .image-lightbox-nav:focus {
+      background: rgba(255, 255, 255, 0.24);
+      color: #fff;
+      transform: scale(1.04);
+    }
+
+    .image-lightbox-prev {
+      left: calc(50% - 4rem);
+    }
+
+    .image-lightbox-next {
+      right: calc(50% - 4rem);
+    }
+
+    @media (max-width: 575.98px) {
+      .image-lightbox-modal .modal-body {
+        padding: 1rem;
+      }
+
+      .image-lightbox-modal img {
+        max-height: calc(100vh - 2rem);
+      }
+
+      .image-lightbox-nav {
+        width: 2.75rem;
+        height: 2.75rem;
+        font-size: 1.45rem;
+      }
+    }
+
     .contact-card a {
       color: var(--brand-900);
       text-decoration: none;
@@ -1590,88 +1644,9 @@ customers.
           <div class="product-showcase">
             <?php render_product_carousel('collaredCarousel', 'Collared Shirts', 'Custom collared apparel samples', $collaredImages, 'Collared shirt sample'); ?>
             <?php render_product_carousel('jacketsCarousel', 'Jackets', 'Custom jacket and outerwear samples', $jacketImages, 'Jacket sample'); ?>
-          </div>
-          <div class="row g-4 mt-4">
-            <div class="col-md-6">
-              <article class="product-card reveal">
-                <div class="product-media">
-                  <div class="product-media-item">
-                    <img src="assets/images/customized polo.png?v=<?php echo asset_version('assets/images/customized polo.png'); ?>" alt="Customized polo shirts">
-                  </div>
-                  <div class="product-media-item">
-                    <img src="assets/images/customized jacket.png?v=<?php echo asset_version('assets/images/customized jacket.png'); ?>" alt="Customized jackets">
-                  </div>
-                </div>
-                <div class="content">
-                  <div class="icon-badge"><i class="bi bi-person-badge"></i></div>
-                  <h3>Customized Polos &amp; Jackets</h3>
-                  <p class="section-copy mb-3">Branded polo shirts, corporate outerwear, hoodies, and custom jackets tailored for uniforms, events, and promotional programs.</p>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Corporate uniforms</span>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Event apparel</span>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Team outerwear</span>
-                </div>
-              </article>
-            </div>
-            <div class="col-md-6">
-              <article class="product-card reveal">
-                <div class="product-media">
-                  <div class="product-media-item">
-                    <img src="assets/images/jerseys.png?v=<?php echo asset_version('assets/images/jerseys.png'); ?>" alt="Customized jerseys">
-                  </div>
-                  <div class="product-media-item">
-                    <img src="assets/images/crew necks.png?v=<?php echo asset_version('assets/images/crew necks.png'); ?>" alt="Crew neck shirts">
-                  </div>
-                </div>
-                <div class="content">
-                  <div class="icon-badge"><i class="bi bi-trophy"></i></div>
-                  <h3>Jerseys &amp; Crew Neck Shirts</h3>
-                  <p class="section-copy mb-3">Sublimated jerseys, activewear-inspired tops, and statement crew necks for organizations, sports, campaigns, and retail-ready runs.</p>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Sports jerseys</span>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Campaign shirts</span>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Retail runs</span>
-                </div>
-              </article>
-            </div>
-            <div class="col-md-6">
-              <article class="product-card reveal">
-                <div class="product-media">
-                  <div class="product-media-item">
-                    <img src="assets/images/ecobag.png?v=<?php echo asset_version('assets/images/ecobag.png'); ?>" alt="Ecobags and drawstrings">
-                  </div>
-                  <div class="product-media-item">
-                    <img src="assets/images/promotional.png?v=<?php echo asset_version('assets/images/promotional.png'); ?>" alt="Promotional giveaways">
-                  </div>
-                </div>
-                <div class="content">
-                  <div class="icon-badge"><i class="bi bi-gift"></i></div>
-                  <h3>Eco Bags &amp; Promotional Giveaways</h3>
-                  <p class="section-copy mb-3">Reusable bags, drawstrings, and branded giveaway items suited for activations, employee kits, merchandise packs, and promotional campaigns.</p>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Eco bags</span>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Lanyards</span>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Giveaway kits</span>
-                </div>
-              </article>
-            </div>
-            <div class="col-md-6">
-              <article class="product-card reveal">
-                <div class="product-media">
-                  <div class="product-media-item">
-                    <img src="assets/images/digital.png?v=<?php echo asset_version('assets/images/digital.png'); ?>" alt="Digital printed banners">
-                  </div>
-                  <div class="product-media-item">
-                    <img src="assets/images/sublimation.jpg?v=<?php echo asset_version('assets/images/sublimation.jpg'); ?>" alt="Sublimation printing samples">
-                  </div>
-                </div>
-                <div class="content">
-                  <div class="icon-badge"><i class="bi bi-easel2"></i></div>
-                  <h3>Digital Prints &amp; Event Support</h3>
-                  <p class="section-copy mb-3">Dye-sublimation banners, flags, display materials, and supporting promotional items for exhibits, launches, fairs, and on-ground campaigns.</p>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Event banners</span>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Flags &amp; exhibits</span>
-                  <span class="pill"><i class="bi bi-check2-circle"></i> Campaign freebies</span>
-                </div>
-              </article>
-            </div>
+            <?php render_product_carousel('sportswearCarousel', 'Sportswear', 'Jerseys, activewear, and team apparel samples', $sportswearImages, 'Sportswear sample'); ?>
+            <?php render_product_carousel('accessoriesCarousel', 'Accessories & Giveaways', 'Promotional accessories, bags, and giveaway samples', $accessoriesImages, 'Promotional accessory sample'); ?>
+            <?php render_product_carousel('clientsCarousel', 'Client Work', 'Completed projects and client sample gallery', $clientImages, 'Client project sample'); ?>
           </div>
         </div>
       </section>
@@ -1882,6 +1857,12 @@ customers.
     <div class="modal-dialog modal-fullscreen">
       <div class="modal-content">
         <button type="button" class="btn-close image-lightbox-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="image-lightbox-nav image-lightbox-prev" id="imageLightboxPrev" aria-label="Previous image">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="image-lightbox-nav image-lightbox-next" id="imageLightboxNext" aria-label="Next image">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
         <div class="modal-body">
           <img id="imageLightboxTarget" src="" alt="">
         </div>
@@ -1912,6 +1893,8 @@ customers.
 
     const lightboxModalElement = document.getElementById("imageLightboxModal");
     const lightboxTarget = document.getElementById("imageLightboxTarget");
+    const lightboxPrev = document.getElementById("imageLightboxPrev");
+    const lightboxNext = document.getElementById("imageLightboxNext");
     const productCarousels = document.querySelectorAll(".product-carousel-panel .carousel");
 
     const loadCarouselSlideImages = (slide) => {
@@ -1939,17 +1922,50 @@ customers.
 
     if (lightboxModalElement && lightboxTarget && window.bootstrap) {
       const lightboxModal = new bootstrap.Modal(lightboxModalElement);
-      const lightboxImages = document.querySelectorAll("main img");
+      const lightboxImages = Array.from(document.querySelectorAll("main img"));
+      let activeLightboxIndex = 0;
 
-      lightboxImages.forEach((image) => {
+      const showLightboxImage = (index) => {
+        if (!lightboxImages.length) {
+          return;
+        }
+
+        activeLightboxIndex = (index + lightboxImages.length) % lightboxImages.length;
+        const image = lightboxImages[activeLightboxIndex];
+        const source = image.getAttribute("data-gallery-src") || image.getAttribute("data-src") || image.getAttribute("src");
+        const alt = image.getAttribute("alt") || "Expanded image";
+
+        lightboxTarget.setAttribute("src", source);
+        lightboxTarget.setAttribute("alt", alt);
+      };
+
+      const showAdjacentLightboxImage = (direction) => {
+        showLightboxImage(activeLightboxIndex + direction);
+      };
+
+      lightboxImages.forEach((image, index) => {
         image.addEventListener("click", () => {
-          const source = image.getAttribute("data-gallery-src") || image.getAttribute("src");
-          const alt = image.getAttribute("alt") || "Expanded image";
-
-          lightboxTarget.setAttribute("src", source);
-          lightboxTarget.setAttribute("alt", alt);
+          showLightboxImage(index);
           lightboxModal.show();
         });
+      });
+
+      if (lightboxPrev) {
+        lightboxPrev.addEventListener("click", () => showAdjacentLightboxImage(-1));
+      }
+
+      if (lightboxNext) {
+        lightboxNext.addEventListener("click", () => showAdjacentLightboxImage(1));
+      }
+
+      lightboxModalElement.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") {
+          showAdjacentLightboxImage(-1);
+        }
+
+        if (event.key === "ArrowRight") {
+          showAdjacentLightboxImage(1);
+        }
       });
 
       lightboxModalElement.addEventListener("hidden.bs.modal", () => {
