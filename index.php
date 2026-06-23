@@ -1212,6 +1212,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
       margin-top: 0.15rem;
     }
 
+    #contact {
+      background:
+        linear-gradient(90deg, rgba(247, 252, 249, 0.96), rgba(247, 252, 249, 0.84) 52%, rgba(247, 252, 249, 0.62)),
+        url("assets/images/contact_bg.jpg?v=<?php echo asset_version('assets/images/contact_bg.jpg'); ?>") center / cover no-repeat;
+    }
+
     .contact-cta {
       border-radius: var(--radius-xl);
       padding: 2rem;
