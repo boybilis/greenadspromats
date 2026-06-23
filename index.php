@@ -846,6 +846,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
       -webkit-backdrop-filter: blur(12px);
     }
 
+    .about-split-card {
+      min-height: 100%;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .about-split-card img {
+      height: auto;
+      min-height: 0;
+      aspect-ratio: 16 / 10;
+    }
+
+    .about-split-content {
+      padding: 1.45rem;
+    }
+
+    .about-split-content h3 {
+      margin-bottom: 0.65rem;
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+
+    .about-split-content .section-copy {
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+
     .equipment-panel {
       padding: 2rem;
       border-radius: var(--radius-xl);
@@ -1381,7 +1407,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
         left: auto;
         right: auto;
         bottom: auto;
-        margin: -5.5rem 1rem 1rem;
+        margin: 0;
+        border-radius: 0 0 24px 24px;
+      }
+
+      #about .about-split-card img {
+        aspect-ratio: 4 / 3;
       }
 
       .navbar {
@@ -1631,29 +1662,35 @@ customers.
             <div class="col-lg-7">
               <div class="row g-4">
                 <div class="col-md-6">
-                  <div class="info-card reveal">
-                    <div class="icon-badge"><i class="bi bi-bullseye"></i></div>
-                    <h3>Mission</h3>
-                    <p class="mb-0 section-copy">Provide excellent promotional apparel at the most reasonable cost while generating healthy sales, fair compensation, and a comfortable, productive work environment.</p>
+                  <div class="split-highlight about-split-card reveal">
+                    <img src="assets/images/mission_img.jpg?v=<?php echo asset_version('assets/images/mission_img.jpg'); ?>" alt="Green Ads and Promats mission display">
+                    <div class="about-split-content">
+                      <h3>Mission</h3>
+                      <p class="mb-0 section-copy">Provide excellent promotional apparel at the most reasonable cost while generating healthy sales, fair compensation, and a comfortable, productive work environment.</p>
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-6">
-                  <div class="info-card reveal">
-                    <div class="icon-badge"><i class="bi bi-eye"></i></div>
-                    <h3>Vision</h3>
-                    <p class="mb-0 section-copy">Become a leading supplier of customized promotional apparel in the Philippines through consistency, quality, and long-term client trust.</p>
+                  <div class="split-highlight about-split-card reveal">
+                    <img src="assets/images/vision_img.jpg?v=<?php echo asset_version('assets/images/vision_img.jpg'); ?>" alt="Green Ads and Promats customized giveaway samples">
+                    <div class="about-split-content">
+                      <h3>Vision</h3>
+                      <p class="mb-0 section-copy">Become a leading supplier of customized promotional apparel in the Philippines through consistency, quality, and long-term client trust.</p>
+                    </div>
                   </div>
                 </div>
                 <div class="col-12">
-                  <div class="info-card reveal">
-                    <div class="icon-badge"><i class="bi bi-clock-history"></i></div>
-                    <h3>Our Beginnings</h3>
-                    <p class="section-copy mb-3">
-                      Green Ads &amp; Promats, Inc. was formerly known as MBM Giftshoppe, conceptualized in 2002 to serve a growing demand for corporate and promotional materials. In 2007, the founders formalized the business and focused on garments and giveaways, moving into direct manufacturing to reduce cost, meet deadlines, and ensure better quality control.
-                    </p>
-                    <p class="section-copy mb-0">
-                      That evolution remains the core advantage today: a company that understands both promotion and production, and can translate branding requirements into finished products that are practical, presentable, and scalable.
-                    </p>
+                  <div class="split-highlight about-split-card reveal">
+                    <img src="assets/images/beginnings.jpg?v=<?php echo asset_version('assets/images/beginnings.jpg'); ?>" alt="Green Ads and Promats early exhibit booth">
+                    <div class="about-split-content">
+                      <h3>Our Beginnings</h3>
+                      <p class="section-copy mb-3">
+                        Green Ads &amp; Promats, Inc. was formerly known as MBM Giftshoppe, conceptualized in 2002 to serve a growing demand for corporate and promotional materials. In 2007, the founders formalized the business and focused on garments and giveaways, moving into direct manufacturing to reduce cost, meet deadlines, and ensure better quality control.
+                      </p>
+                    <!--  <p class="section-copy mb-0">
+                        That evolution remains the core advantage today: a company that understands both promotion and production, and can translate branding requirements into finished products that are practical, presentable, and scalable.
+                      </p> -->
+                    </div>
                   </div>
                 </div>
               </div>
