@@ -1218,6 +1218,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
         url("assets/images/contact_bg.jpg?v=<?php echo asset_version('assets/images/contact_bg.jpg'); ?>") center / cover no-repeat;
     }
 
+    #contact .contact-card {
+      background: rgba(255, 255, 255, 0.84);
+      border-color: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 22px 48px rgba(18, 58, 49, 0.18);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
     .contact-cta {
       border-radius: var(--radius-xl);
       padding: 2rem;
@@ -1425,6 +1433,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
         background:
           
           url("assets/images/mobile_contact_bg.jpg?v=<?php echo asset_version('assets/images/mobile_contact_bg.jpg'); ?>") right top / cover no-repeat;
+      }
+
+      #contact .contact-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
       }
 
       .navbar {
