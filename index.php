@@ -1424,7 +1424,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
       #contact {
         background:
           linear-gradient(180deg, rgba(247, 252, 249, 0.92), rgba(247, 252, 249, 0.78)),
-          url("assets/images/mobile_contact_bg.jpg?v=<?php echo asset_version('assets/images/mobile_contact_bg.jpg'); ?>") center top / cover no-repeat;
+          url("assets/images/mobile_contact_bg.jpg?v=<?php echo asset_version('assets/images/mobile_contact_bg.jpg'); ?>") right top / cover no-repeat;
       }
 
       .navbar {
