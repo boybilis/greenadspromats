@@ -1687,7 +1687,7 @@ customers.
             </div>
             <div class="col-lg-7">
               <div class="row g-4">
-                <div class="col-md-6">
+                <div class="col-12">
                   <div class="split-highlight about-split-card reveal">
                     <img src="assets/images/mission_img.jpg?v=<?php echo asset_version('assets/images/mission_img.jpg'); ?>" alt="Green Ads and Promats mission display">
                     <div class="about-split-content">
@@ -1696,7 +1696,7 @@ customers.
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12">
                   <div class="split-highlight about-split-card reveal">
                     <img src="assets/images/vision_img.jpg?v=<?php echo asset_version('assets/images/vision_img.jpg'); ?>" alt="Green Ads and Promats customized giveaway samples">
                     <div class="about-split-content">
