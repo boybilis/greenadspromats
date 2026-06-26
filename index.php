@@ -1596,7 +1596,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
                 <i class="bi bi-stars"></i>
                 Custom Premium Apparels
               </div>
-              <h1 class="reveal">Wear.<br>Promote.<br>Connect.</h1>
+              <h2 class="reveal">Wear.<br>Promote.<br>Connect.</h2>
               <p class="hero-lead reveal">
                 <b>Green Ads & Promats, Inc.</b> is a garment manufacturing company, Dedicated to
 provide excellent promotional apparel at the most reasonable cost for our
