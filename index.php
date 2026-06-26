@@ -1851,7 +1851,7 @@ customers.
                   <a class="btn btn-ghost" href="tel:+63279441063">Call the Office</a>
                 </div>
                 <div class="mt-4 pt-4 border-top border-light border-opacity-25">
-                  <div class="row g-3">
+                  <!--<div class="row g-3">
                     <div class="col-sm-6">
                       <div class="small text-white-50 text-uppercase mb-1">Officer</div>
                       <div class="fw-semibold fs-5">Raoul C. Navarrete</div>
@@ -1862,7 +1862,7 @@ customers.
                       <div class="fw-semibold fs-5">Kristine N. Navarrete</div>
                       <div>Director</div>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
