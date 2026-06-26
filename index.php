@@ -642,7 +642,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
     }
 
     .hero h1 {
-      font-size: clamp(1.9rem, 4.2vw, 3.45rem);
+      font-size: clamp(2rem, 4.55vw, 3.75rem);
       line-height: 1.02;
       margin: 1.25rem 0 1.4rem;
     }
