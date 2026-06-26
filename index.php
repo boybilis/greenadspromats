@@ -1708,15 +1708,15 @@ customers.
                 <div class="col-12">
                   <div class="split-highlight about-split-card reveal">
                     <img src="assets/images/beginnings.jpg?v=<?php echo asset_version('assets/images/beginnings.jpg'); ?>" alt="Green Ads and Promats early exhibit booth">
-                    <div class="about-split-content">
+                   <!-- <div class="about-split-content">
                       <h3>Our Beginnings</h3>
                       <p class="section-copy mb-3">
                         Green Ads &amp; Promats, Inc. was formerly known as MBM Giftshoppe, conceptualized in 2002 to serve a growing demand for corporate and promotional materials. In 2007, the founders formalized the business and focused on garments and giveaways, moving into direct manufacturing to reduce cost, meet deadlines, and ensure better quality control.
                       </p>
-                    <!--  <p class="section-copy mb-0">
+                      <p class="section-copy mb-0">
                         That evolution remains the core advantage today: a company that understands both promotion and production, and can translate branding requirements into finished products that are practical, presentable, and scalable.
-                      </p> -->
-                    </div>
+                      </p> 
+                    </div>-->
                   </div>
                 </div>
               </div>
