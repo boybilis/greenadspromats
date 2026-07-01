@@ -1063,12 +1063,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
     }
 
     .clients-shot {
-      overflow: hidden;
-      border-radius: var(--radius-xl);
       padding: 1.25rem;
-      box-shadow: var(--shadow-xl);
-      background: rgba(255, 255, 255, 0.74);
-      border: 1px solid rgba(255, 255, 255, 0.72);
+      background: transparent;
+      border: 0;
+      box-shadow: none;
     }
 
     .client-logo-grid {
