@@ -172,6 +172,7 @@ $sportswearImages = gallery_images('assets/images/sportswear');
 $accessoriesImages = gallery_images('assets/images/accessories');
 $customizeShirtImages = gallery_images('assets/images/customize shirts');
 $clientImages = gallery_images('assets/images/clients');
+$clientLogoImages = gallery_images('assets/images/logos');
 
 $smtpConfig = [
     'host' => env_value('GAP_SMTP_HOST', 'smtp.hostinger.com'),
@@ -642,7 +643,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
     }
 
     .hero h1 {
-      font-size: clamp(2rem, 4.55vw, 3.75rem);
+      font-size: clamp(2rem, 4.8vw, 4rem);
       line-height: 1.02;
       margin: 1.25rem 0 1.4rem;
     }
@@ -1064,9 +1065,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
     .clients-shot {
       overflow: hidden;
       border-radius: var(--radius-xl);
+      padding: 1.25rem;
       box-shadow: var(--shadow-xl);
       background: rgba(255, 255, 255, 0.74);
       border: 1px solid rgba(255, 255, 255, 0.72);
+    }
+
+    .client-logo-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .client-logo-card {
+      min-width: 0;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(24, 88, 76, 0.1);
+      box-shadow: 0 8px 20px rgba(18, 58, 49, 0.08);
+    }
+
+    .clients-shot .client-logo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    @media (max-width: 991.98px) {
+      .client-logo-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .clients-shot {
+        padding: 0.8rem;
+      }
+
+      .client-logo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+
+      .client-logo-card {
+        padding: 0.75rem;
+        border-radius: 16px;
+      }
     }
 
     main img {
@@ -1785,7 +1834,18 @@ customers.
             </div>
           </div>
           <div class="clients-shot reveal">
-            <img src="assets/images/clients.jpg?v=<?php echo asset_version('assets/images/clients.jpg'); ?>" alt="Logos of Green Ads and Promats clients">
+            <div class="client-logo-grid">
+              <?php foreach ($clientLogoImages as $logoPath): ?>
+                <div class="client-logo-card">
+                  <img
+                    src="<?php echo htmlspecialchars($logoPath, ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo asset_version($logoPath); ?>"
+                    alt="<?php echo htmlspecialchars(image_alt_from_path($logoPath, 'Client logo'), ENT_QUOTES, 'UTF-8'); ?>"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                </div>
+              <?php endforeach; ?>
+            </div>
           </div>
         </div>
       </section>
