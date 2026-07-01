@@ -1754,7 +1754,7 @@ customers.
                 </div>
                 <div class="col-12">
                        <div class="split-highlight about-split-card reveal">
-                    <img src="assets/images/beginnings.jpg?v=<?php echo asset_version('assets/images/tradeshow.jpg'); ?>" alt="Green Ads and Promats early exhibit booth">
+                    <img src="assets/images/tradeshow.jpg?v=<?php echo asset_version('assets/images/tradeshow.jpg'); ?>" alt="Green Ads and Promats early exhibit booth">
               <!-- <div class="about-split-content">
                       <h3>Our Beginnings</h3>
                       <p class="section-copy mb-3">
