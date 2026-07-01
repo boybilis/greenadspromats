@@ -371,6 +371,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_type'] ?? '') === 'in
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Green Ads &amp; Promats, Inc. | Wear • Promote • Connect</title>
   <meta name="description" content="Green Ads &amp; Promats, Inc. manufactures customized apparel, promotional giveaways, banners, and branded merchandise for businesses in the Philippines.">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png?v=<?php echo asset_version('assets/images/favicon.png'); ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
