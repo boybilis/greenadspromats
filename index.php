@@ -1833,7 +1833,7 @@ customers.
               <p class="section-copy reveal mb-0">Our portfolio spans a diverse range of industries, including manufacturing, telecommunications, food and beverage, entertainment, finance, hospitality, and logistics. This broad client base reflects our ability to deliver effective solutions tailored to the unique needs of various sectors.</p>
             </div>
           </div>
-          <div class="clients-shot reveal">
+          <div class="clients-shot">
             <div class="client-logo-grid">
               <?php foreach ($clientLogoImages as $logoPath): ?>
                 <div class="client-logo-card">
